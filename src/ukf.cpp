@@ -45,13 +45,12 @@ UKF::UKF() {
   // Radar measurement noise standard deviation radius change in m/s
   std_radrd_ = 0.3;
 
-  /**
-  TODO:
-
-  Complete the initialization. See ukf.h for other member properties.
-
-  Hint: one or more values initialized above might be wildly off...
-  */
+  is_initialized_ = false;
+  n_x_ = 5;
+  n_aug_ = n_x_ + 2;
+  lambda_ = 3 - n_aug_;
+  weights_ = VectorXd(2 * n_aug_ + 1);
+  Xsig_pred_ = MatrixXd(n_x_, 2 * n_aug_ + 1);
 }
 
 UKF::~UKF() {}
@@ -61,12 +60,33 @@ UKF::~UKF() {}
  * either radar or laser.
  */
 void UKF::ProcessMeasurement(MeasurementPackage meas_package) {
-  /**
-  TODO:
+  if (!is_initialized_) {
+    is_initialized_ = true;
+    time_us_ = meas_package.timestamp_;
 
-  Complete this function! Make sure you switch between lidar and radar
-  measurements.
-  */
+    if (meas_package.sensor_type_ == MeasurementPackage::RADAR) {
+      float ro = meas_package.raw_measurements_(0);
+      float phi = meas_package.raw_measurements_(1);
+      x_[0] = ro * cos(phi);
+      x_[1] = ro * sin(phi);
+    } else if (meas_package.sensor_type_ == MeasurementPackage::LASER) {
+      x_[0] = meas_package.raw_measurements_(0);
+      x_[1] = meas_package.raw_measurements_(1);
+    }
+    x_[2] = 0;
+    x_[3] = 0;
+    x_[4] = 0;
+    return;
+  }
+  if (meas_package.sensor_type_ == MeasurementPackage::RADAR && use_radar_) {
+    Prediction(meas_package.timestamp_ - time_us_);
+    UpdateRadar(meas_package);
+    time_us_ = meas_package.timestamp_;
+  } else if (meas_package.sensor_type_ == MeasurementPackage::LASER && use_laser_) {
+    Prediction(meas_package.timestamp_ - time_us_);
+    UpdateLidar(meas_package);
+    time_us_ = meas_package.timestamp_;
+  }
 }
 
 /**
