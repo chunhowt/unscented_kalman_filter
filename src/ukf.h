@@ -119,6 +119,9 @@ private:
   // Predicts mean and covariance based on Xsig_pred_.
   void PredictMeanAndCovariance();
 
+  // Predicts using radar measurement.
+  void PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out, MatrixXd* Zsig_out);
+
   // Augmented sigma points matrix
   MatrixXd Xsig_aug_;
 };
