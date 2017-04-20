@@ -122,6 +122,9 @@ private:
   // Predicts using radar measurement.
   void PredictRadarMeasurement(VectorXd* z_out, MatrixXd* S_out, MatrixXd* Zsig_out);
 
+  // Predicts using laser measurement.
+  void PredictLaserMeasurement(VectorXd* z_out, MatrixXd* S_out, MatrixXd* Zsig_out);
+
   // Augmented sigma points matrix
   MatrixXd Xsig_aug_;
 };
