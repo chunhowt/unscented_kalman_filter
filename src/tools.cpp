@@ -14,6 +14,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   // RMSE = sqrt(sum((estimation - ground_truth)^2) / len(estimations)).
   // First, compute the sum of square difference.
   VectorXd square_diff = VectorXd(4);
+  square_diff.fill(0);
   for (int i = 0; i < estimations.size(); ++i) {
     VectorXd estimation = estimations[i];
     VectorXd truth = ground_truth[i];
